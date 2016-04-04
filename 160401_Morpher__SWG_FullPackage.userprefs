@@ -1,0 +1,15 @@
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/InitializeCamera.cs">
+    <Files>
+      <File FileName="Assets/Scripts/OSCHandler.cs" Line="131" Column="3" />
+      <File FileName="Assets/Scripts/InitializeCamera.cs" Line="18" Column="30" />
+      <File FileName="Assets/UnityOSC/OSC/OSCServer.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/GazeMeshModellerFunctions.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
