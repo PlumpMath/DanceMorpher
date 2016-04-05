@@ -20,7 +20,7 @@ public class GazeSoundFunctions{
 	public static string backgroundPath = "bg1";
 
 	public static AudioClip LoadClip(string name){
-		return (AudioClip) Resources.Load("sounds/" + name) as AudioClip;
+		return (AudioClip) Resources.Load("Sounds/" + name) as AudioClip;
 	}
 
 	public static AudioClip RandomHitClip(){

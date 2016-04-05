@@ -108,30 +108,14 @@ public class OSCHandler : MonoBehaviour
 	public void Init()
 	{
         //Initialize OSC clients (transmitters)
-        //Example:		
-        //CreateClient("SuperCollider", IPAddress.Parse("127.0.0.1"), 5555);
-		// static IPs, ish
-		var computerListenHost = "192.168.1.36";
-		var computerListenPort = 5555;
-		var phoneAListenHost = "192.168.1.105";
-		var phoneAListenPort = 5556;
-		var phoneBListenHost = "192.168.253.202";
-		var phoneBListenPort = 5557;
 
-
-
+        var serverListenHost = "192.168.1.36";
+		var serverListenPort = 5555;
 
 		// EDIT THIS
 		// ALSO we have to set index in InitializeCamera.cs
 
-	
-		//var IAm = "phoneB"; var TheyAre = "computer"; 
-		//var IAm = "computer"; var TheyAre = "phoneB";
-
-		var IAm = "computer"; var TheyAre = "phoneA";
-		//var IAm = "phoneA"; var TheyAre = "computer";
-		//var IAm = "phoneB"; var TheyAre = "phoneA";
-
+		var IAm = "computer"; 
 
 		//candidateName = "targetCandidate";
 		candidateName = "thermoCandidate";
@@ -143,18 +127,17 @@ public class OSCHandler : MonoBehaviour
 		float shrinkStrength = -7.2f;
 		float shrinkRadius = 10.2f;
 
-		if (IAm == "computer") {	listenFromPort = computerListenPort; myRadius = growRadius; myStrength = growStrength;	}
-		if (IAm == "phoneA") {	listenFromPort = phoneAListenPort; myRadius = shrinkRadius; myStrength = shrinkStrength;	}
-		if (IAm == "phoneB") {	listenFromPort = phoneBListenPort;	myRadius = growRadius; myStrength = growStrength;	}
-		if (TheyAre == "computer") {	sendToHost = computerListenHost;	sendToPort = computerListenPort; theirRadius = shrinkRadius; theirStrength = shrinkStrength;	}
-		if (TheyAre == "phoneA") {		sendToHost = phoneAListenHost;		sendToPort = phoneAListenPort; theirRadius = shrinkRadius; theirStrength = shrinkStrength;	}
-		if (TheyAre == "phoneB") {		sendToHost = phoneBListenHost;		sendToPort = phoneBListenPort; theirRadius = growRadius; theirStrength = growStrength;	}
+
+		if (IAm == "computer") {	myRadius = shrinkRadius; myStrength = shrinkStrength;	}
+		if (IAm == "phoneA") {	myRadius = shrinkRadius; myStrength = shrinkStrength;	}
+		if (IAm == "phoneB") {	myRadius = growRadius; myStrength = growStrength;	}
 
 
-
+		sendToPort = serverListenPort;
+		sendToHost = serverListenHost;
 
 		// client = sending to 
-		CreateClient("testServer", IPAddress.Parse(sendToHost), sendToPort);
+		CreateClient("toServer", IPAddress.Parse(sendToHost), sendToPort);
 
 		// server = Listening From
 		CreateServer("thisListener", listenFromPort);
@@ -187,12 +170,12 @@ public class OSCHandler : MonoBehaviour
 		string cameraPosition = Camera.main.gameObject.transform.position.ToString("F5");
 		string cameraEuler = Camera.main.gameObject.transform.eulerAngles.ToString("F5");
 
-		string OSCAddress = "/SWG/camera/" + InitializeCamera.index + "/positionorientation";
+		string OSCAddress = "/SWG/camera/" + InitializeCamera.index + "/position";
 		string OSCMessage = cameraPosition + "/" + cameraEuler;
 
 		print ("YOOO, sending message ::: " + OSCMessage + " ::: to" + OSCAddress);
 
-		OSCHandler.Instance.SendMessageToClient("testServer", OSCAddress, OSCMessage);
+		OSCHandler.Instance.SendMessageToClient("toServer", OSCAddress, OSCMessage);
 
 
 	}
@@ -219,11 +202,9 @@ public class OSCHandler : MonoBehaviour
 			string oscMessage = servers["thisListener"].server.LastReceivedPacket.Data[0].ToString();
 			string oscAddress = servers["thisListener"].server.LastReceivedPacket.Address;
 
-			if(oscAddress == "/init") {
-				// if we receive an initialization message, then reload level
-				//SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-				//print("HEY! WE GOTTA INITIALIZE!!"); 
-				//return;
+			if(oscAddress == "/reset") {
+				// if we receive a reset message, then reload level
+				SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 			}
 
 			print(">>>>");
@@ -270,13 +251,12 @@ public class OSCHandler : MonoBehaviour
 		print("handleGazesHit()");
 
 		//handle our gaze
-		object ourRaycastHit = GazeMeshModellerFunctions.GazeUpdate (Camera.main.gameObject, candidate, myStrength, myRadius);
+		RaycastHit ourRaycastHit = GazeMeshModellerFunctions.GazeUpdate (Camera.main.gameObject, candidate, myStrength, myRadius);
 
-		if (ourRaycastHit != null) {
+		if (ourRaycastHit.collider != null) {
 			try {
-			RaycastHit thisr = (RaycastHit)ourRaycastHit;
-			print ("gazehit: WE hit something!");
-			print (thisr.ToString ());
+				print ("gazehit: WE hit something!");
+				print (ourRaycastHit.ToString ());
 			} catch {
 			}
 		}
@@ -284,9 +264,9 @@ public class OSCHandler : MonoBehaviour
 		//handle their gaze
 		if (theirCameraObject) {
 
-			object theirRaycastHit = GazeMeshModellerFunctions.GazeUpdate (theirCameraObject, candidate, theirStrength, theirRadius);
+			RaycastHit theirRaycastHit = GazeMeshModellerFunctions.GazeUpdate (theirCameraObject, candidate, theirStrength, theirRadius);
 
-			if(theirRaycastHit != null) {
+			if(theirRaycastHit.collider != null) {
 
 
 				print ("gazehit: THEY hit something!");
