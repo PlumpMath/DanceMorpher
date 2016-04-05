@@ -10,8 +10,31 @@ using System;
 
 public class MQTTHandler : MonoBehaviour {
 
+	#region Singleton Constructors
+	static MQTTHandler()
+	{
+	}
+
+	MQTTHandler()
+	{
+	}
+
+	public static MQTTHandler Instance 
+	{
+		get 
+		{
+			if (_instance == null) 
+			{
+				_instance = new GameObject ("MQTTHandler").AddComponent<MQTTHandler>();
+			}
+
+			return _instance;
+		}
+	}
+	#endregion
+
 	#region Member Variables
-	private static HitHandler _instance = null;
+	private static MQTTHandler _instance = null;
 
 	private const int _loglength = 25;
 
@@ -24,8 +47,7 @@ public class MQTTHandler : MonoBehaviour {
 	public static string candidateName;
 	public static string myName;
 
-	private UnityEngine.SceneManagement.Scene activeScene;
-
+	private static string setCamerasString = ""; 
 
 
 	#endregion
@@ -34,7 +56,7 @@ public class MQTTHandler : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-		activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+
 
 		// create client instance 
 
@@ -60,10 +82,7 @@ public class MQTTHandler : MonoBehaviour {
 		client.Subscribe(new string[] { "/DanceMorpher/reset" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
 
 
-
-
-		//InvokeRepeating("sendCameraMessage", 0, 2F);
-		//InvokeRepeating("receiveCameraMessages", 0, 0.1F);
+		InvokeRepeating("sendCameraMessage", 0, 2F);
 
 
 	}
@@ -75,15 +94,33 @@ public class MQTTHandler : MonoBehaviour {
 		//print (System.Text.Encoding.UTF8.GetString (e.Topic));
 
 		if (e.Topic == "/DanceMorpher/cameras/positions") {
-			print (e.Message);
+
+			string msg = System.Text.Encoding.UTF8.GetString(e.Message);
+			print (msg);
+
+			setCamerasString = msg;
+			// this stuff will be handled by 'Update()' because Unity wants it so
 		}
 
 		if (e.Topic == "/DanceMorpher/reset") {
-			Debug.Log ("========== Resetting scene");
 
-			UnityEngine.SceneManagement.SceneManager.LoadScene(activeScene.buildIndex);
+
+			HitHandler.resetMesh();
+
 		}
 	} 
+
+	void Update() {
+
+		// this is a workaround because Unity wants 'Find' to be part of the main thread
+		if (setCamerasString != "") {
+			var cs = setCamerasString;
+			setCamerasString = "";
+
+			setCameras (cs);
+		}
+
+	}
 
 
 	string getTimestamp() {
@@ -95,19 +132,35 @@ public class MQTTHandler : MonoBehaviour {
 
 
 
+	void setCameras(string camerasString) {
+		string[] cameras = camerasString.Split (';');
+
+		foreach (string c in cameras) {
+
+			string[] pos = c.Split ('/');
+
+			print (pos [0]);
+			print (pos [1]);
+			print (pos [2]);
+
+			setCameraPosition (pos [0], getVector3 (pos [1]), getVector3 (pos [2]));
+		}
+
+	}
+		
+
 	void sendCameraMessage() {
 
-		Debug.Log("sending...");
+		//Debug.Log("sending...");
 
 		string cameraPosition = Camera.main.gameObject.transform.position.ToString("F5");
 		string cameraEuler = Camera.main.gameObject.transform.eulerAngles.ToString("F5");
 
 		string message = cameraPosition + "/" + cameraEuler + "/" + getTimestamp();
-		message = "yeh";
 
 		client.Publish("/DanceMorpher/camera/" + myName + "/position", System.Text.Encoding.UTF8.GetBytes(message), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
 
-		Debug.Log("sent");
+		//Debug.Log("sent");
 	
 	}
 
@@ -120,6 +173,19 @@ public class MQTTHandler : MonoBehaviour {
 		return rValue;
 	}
 
+
+	void setCameraPosition(string cameraName, Vector3 position, Vector3 eulerAngles) {
+		GameObject cameraToSet = GameObject.Find (cameraName);
+
+
+		cameraToSet.gameObject.transform.position = position;
+		cameraToSet.gameObject.transform.eulerAngles = eulerAngles;
+
+		// we store the Cameraindex in a static Var so that handleGazesHit() can handle it
+		//print("camera>>>");
+		//print(cameraID);
+		//theirCameraObject = cameraToSet;
+	}
 
 	void receiveCameraMessages() {
 		/*

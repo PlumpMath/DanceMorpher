@@ -85,6 +85,11 @@ public class HitHandler : MonoBehaviour
 	void Update() {
 	}
 
+	public static void resetMesh() {
+		Debug.Log ("========== Resetting scene");
+
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+	}
 
 	void handleGazesHit() {
 
