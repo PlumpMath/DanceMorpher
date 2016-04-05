@@ -150,9 +150,9 @@ public class OSCHandler : MonoBehaviour
 	void Start() {
 		OSCHandler.Instance.Init();
 
-		InvokeRepeating("sendCameraMessage", 0, 0.1F);
-		InvokeRepeating("receiveCameraMessage", 0, 0.1F);
-		InvokeRepeating ("handleGazesHit", 1, 0.25F);
+		//InvokeRepeating("sendCameraMessage", 0, 0.1F);
+		//InvokeRepeating("receiveCameraMessage", 0, 0.1F);
+		InvokeRepeating ("handleGazesHit", 1, 1.25F);
 
 
 	}
@@ -257,6 +257,11 @@ public class OSCHandler : MonoBehaviour
 			try {
 				print ("gazehit: WE hit something!");
 				print (ourRaycastHit.ToString ());
+
+				print ("playing sound");
+				GazeSoundFunctions.PlayRandomHitAtHit(ourRaycastHit);
+
+
 			} catch {
 			}
 		}
