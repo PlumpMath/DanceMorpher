@@ -33,6 +33,7 @@ public class MQTTHandler : MonoBehaviour {
 	}
 	#endregion
 
+
 	#region Member Variables
 	private static MQTTHandler _instance = null;
 
@@ -44,7 +45,6 @@ public class MQTTHandler : MonoBehaviour {
 	public static float myRadius = 0.0f;
 	public static float theirStrength = 0.0f; 
 	public static float theirRadius = 0.0f;
-	public static string candidateName;
 
 	private static string setCamerasString = ""; 
 
@@ -57,6 +57,11 @@ public class MQTTHandler : MonoBehaviour {
 
 	#endregion
 
+	/**********/
+	// receives /DanceMorpher/cameras/positions
+	// sends /DanceMorpher/camera/$CAMERANAME/position
+
+
 	private MqttClient client;
 	// Use this for initialization
 	void Start () {
@@ -64,8 +69,6 @@ public class MQTTHandler : MonoBehaviour {
 		// create client instance 
 
 		//Initialize OSC clients (transmitters)
-
-		candidateName = "thermoCandidate";
 
 		client = new MqttClient(serverListenHost, serverListenPort , false , null ); 
 		
@@ -98,6 +101,8 @@ public class MQTTHandler : MonoBehaviour {
 			setCamerasString = msg;
 			// this stuff will be handled by 'Update()' because Unity wants it so
 		}
+
+
 
 		if (e.Topic == "/DanceMorpher/resetscenedontusethis") {
 			Debug.Log ("Reset Scene!!!");
@@ -152,6 +157,11 @@ public class MQTTHandler : MonoBehaviour {
 				print (pos [2]);
 
 				setCameraPosition (pos [0], getVector3 (pos [1]), getVector3 (pos [2]));
+
+				// ask HitHAndler to look for hits for these cameras
+				HitHandler.lookForHit (pos [0]);
+
+
 			}
 		}
 
@@ -200,58 +210,6 @@ public class MQTTHandler : MonoBehaviour {
 		//theirCameraObject = cameraToSet;
 	}
 
-	void receiveCameraMessages() {
-		/*
-		OSCHandler.Instance.UpdateLogs();
-
-		Dictionary<string, ServerLog> servers = new Dictionary<string, ServerLog>();
-		servers = OSCHandler.Instance.Servers;
-
-		try {
-
-			string oscAddress = servers["thisListener"].server.LastReceivedPacket.Address;
-			string oscMessage = servers["thisListener"].server.LastReceivedPacket.Data[0].ToString();
-
-			if(oscAddress == "/reset") {
-				// if we receive a reset message, then reload level
-				SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-			} else {
-
-				print(">>>>");
-
-				print (oscMessage);
-				print (oscAddress);
-
-
-				Regex regex = new Regex(@"/camera/(?<cameraID>\w+?)/position");
-				var match = regex.Match(oscAddress);
-				var cameraID = match.Groups["cameraID"].Value;
-
-
-				GameObject cameraToSet = GameObject.Find ("CAMERA" + cameraID);
-				string[] positionorientation = oscMessage.Split('/');
-
-				print(getVector3(positionorientation[0]));
-				print(positionorientation[1]);
-
-				cameraToSet.gameObject.transform.position = getVector3(positionorientation[0]);
-				cameraToSet.gameObject.transform.eulerAngles = getVector3(positionorientation[1]);
-
-
-				// we store the Cameraindex in a static Var so that handleGazesHit() can handle it
-				print("camera>>>");
-				print(cameraID);
-				theirCameraObject = cameraToSet;
-			}
-
-
-
-		} catch(Exception e) {
-			print ("Error happened: " + e);
-		}
-
-		*/
-	}
 
 
 

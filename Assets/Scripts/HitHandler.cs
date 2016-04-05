@@ -47,7 +47,12 @@ public class HitHandler : MonoBehaviour
 	public static float theirStrength = 0.0f; 
 	public static float theirRadius = 0.0f;
 	public static string candidateName;
+
 	private static bool resetSceneFlag = false;
+	private static bool playingBackgroundAudio = false;
+
+
+	public static List<string> camerasToUpdate;
 
 
 	#endregion
@@ -59,7 +64,7 @@ public class HitHandler : MonoBehaviour
 		// ALSO we have to set index in InitializeCamera.cs
 
 		//candidateName = "targetCandidate";
-		candidateName = "thermoCandidate";
+		candidateName = "targetCandidate2";
 
 
 		// THE BELOW STUFF JUST MAKES OUR LIVES EASIER. DON'T EDIT.
@@ -72,15 +77,14 @@ public class HitHandler : MonoBehaviour
 		myRadius = growRadius;
 		myStrength = growStrength;
 
+		camerasToUpdate = new List<string>();
+
 	}
 
 	void Start() {
 		HitHandler.Instance.Init();
 
-		InvokeRepeating ("handleGazesHit", 1, 1.25F);
-
-
-		GazeSoundFunctions.PlayBackgroundAtObject( Camera.main.gameObject);
+		InvokeRepeating ("handleGazesHit", 1, 0.5F);
 
 	}
 
@@ -90,6 +94,21 @@ public class HitHandler : MonoBehaviour
 			resetSceneFlag = false;
 			SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex);
 		}
+		if (!playingBackgroundAudio && Camera.main.gameObject != null) {
+			GazeSoundFunctions.PlayBackgroundAtObject (Camera.main.gameObject);
+			print ("playing");
+			playingBackgroundAudio = true;
+		}
+
+		if (camerasToUpdate.Count > 0) {
+			foreach (string c in camerasToUpdate) {
+				
+				print (c);
+				camerasToUpdate.RemoveAt (0);
+			}
+
+		}
+
 	}
 
 	public static void resetSceneDontUseThis() {
@@ -106,12 +125,16 @@ public class HitHandler : MonoBehaviour
 
 	}
 
+	public static void lookForHit(string cameraName) {
+		// put this in a queue and look for hit through update()
+
+		camerasToUpdate.Add (cameraName);
+	}
+
+
 	void handleGazesHit() {
 
 		GameObject candidate = GameObject.Find (candidateName);
-
-
-		print("handleGazesHit()");
 
 		//handle our gaze
 		RaycastHit ourRaycastHit = GazeMeshModellerFunctions.GazeUpdate (Camera.main.gameObject, candidate, myStrength, myRadius);
