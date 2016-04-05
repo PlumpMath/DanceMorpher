@@ -47,6 +47,7 @@ public class HitHandler : MonoBehaviour
 	public static float theirStrength = 0.0f; 
 	public static float theirRadius = 0.0f;
 	public static string candidateName;
+	private static bool resetSceneFlag = false;
 
 
 	#endregion
@@ -77,18 +78,32 @@ public class HitHandler : MonoBehaviour
 		HitHandler.Instance.Init();
 
 		InvokeRepeating ("handleGazesHit", 1, 1.25F);
-	
+
+
 		GazeSoundFunctions.PlayBackgroundAtObject( Camera.main.gameObject);
 
 	}
 
 	void Update() {
+
+		if (resetSceneFlag) {
+			resetSceneFlag = false;
+			SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex);
+		}
 	}
 
-	public static void resetMesh() {
+	public static void resetSceneDontUseThis() {
 		Debug.Log ("========== Resetting scene");
+		// don't use this, because this will offset the orientation of cameras from the moving rack.
 
-		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+		resetSceneFlag = true;
+	}
+
+	public static void reloadMesh() {
+		Debug.Log ("========== reloading mesh");
+
+		// RELOAD MESH STUFF HERE
+
 	}
 
 	void handleGazesHit() {

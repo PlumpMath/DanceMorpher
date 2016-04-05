@@ -45,9 +45,14 @@ public class MQTTHandler : MonoBehaviour {
 	public static float theirStrength = 0.0f; 
 	public static float theirRadius = 0.0f;
 	public static string candidateName;
-	public static string myName;
 
 	private static string setCamerasString = ""; 
+
+
+	public static string serverListenHost = "vps.provolot.com";
+	public static int serverListenPort = 1883;
+
+	public static string myCameraName;
 
 
 	#endregion
@@ -56,16 +61,9 @@ public class MQTTHandler : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-
-
 		// create client instance 
 
 		//Initialize OSC clients (transmitters)
-
-		var serverListenHost = "vps.provolot.com";
-		var serverListenPort = 1883;
-
-		myName = "computer"; 
 
 		candidateName = "thermoCandidate";
 
@@ -79,9 +77,10 @@ public class MQTTHandler : MonoBehaviour {
 		
 		// subscribe to the topic "/home/temperature" with QoS 2 
 		client.Subscribe(new string[] { "/DanceMorpher/cameras/positions" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
-		client.Subscribe(new string[] { "/DanceMorpher/reset" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
+		client.Subscribe(new string[] { "/DanceMorpher/resetscene" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
+		client.Subscribe(new string[] { "/DanceMorpher/reloadmesh" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
 
-
+	
 		InvokeRepeating("sendCameraMessage", 0, 2F);
 
 
@@ -90,11 +89,9 @@ public class MQTTHandler : MonoBehaviour {
 	{ 
 
 		Debug.Log("Received: " + System.Text.Encoding.UTF8.GetString(e.Message)  );
-		print (e.Topic);
-		//print (System.Text.Encoding.UTF8.GetString (e.Topic));
+		Debug.Log(e.Topic);
 
 		if (e.Topic == "/DanceMorpher/cameras/positions") {
-
 			string msg = System.Text.Encoding.UTF8.GetString(e.Message);
 			print (msg);
 
@@ -102,11 +99,14 @@ public class MQTTHandler : MonoBehaviour {
 			// this stuff will be handled by 'Update()' because Unity wants it so
 		}
 
-		if (e.Topic == "/DanceMorpher/reset") {
+		if (e.Topic == "/DanceMorpher/resetscenedontusethis") {
+			Debug.Log ("Reset Scene!!!");
+			HitHandler.resetSceneDontUseThis();
+		}
 
-
-			HitHandler.resetMesh();
-
+		if (e.Topic == "/DanceMorpher/reloadmesh") {
+			Debug.Log ("Reload Mesh");
+			HitHandler.reloadMesh();
 		}
 	} 
 
@@ -114,10 +114,16 @@ public class MQTTHandler : MonoBehaviour {
 
 		// this is a workaround because Unity wants 'Find' to be part of the main thread
 		if (setCamerasString != "") {
+
+			// set cameraString to be empty first, because if setCamera fails, this will loop infinitely)
 			var cs = setCamerasString;
 			setCamerasString = "";
 
 			setCameras (cs);
+		}
+
+		if (myCameraName == null) {
+			myCameraName = Camera.main.name; 
 		}
 
 	}
@@ -139,11 +145,14 @@ public class MQTTHandler : MonoBehaviour {
 
 			string[] pos = c.Split ('/');
 
-			print (pos [0]);
-			print (pos [1]);
-			print (pos [2]);
+			if (pos [0] != myCameraName) {
 
-			setCameraPosition (pos [0], getVector3 (pos [1]), getVector3 (pos [2]));
+				print (pos [0]);
+				print (pos [1]);
+				print (pos [2]);
+
+				setCameraPosition (pos [0], getVector3 (pos [1]), getVector3 (pos [2]));
+			}
 		}
 
 	}
@@ -153,12 +162,16 @@ public class MQTTHandler : MonoBehaviour {
 
 		//Debug.Log("sending...");
 
-		string cameraPosition = Camera.main.gameObject.transform.position.ToString("F5");
-		string cameraEuler = Camera.main.gameObject.transform.eulerAngles.ToString("F5");
+		if (myCameraName != null) {
 
-		string message = cameraPosition + "/" + cameraEuler + "/" + getTimestamp();
+			string cameraPosition = Camera.main.gameObject.transform.position.ToString ("F5");
+			string cameraEuler = Camera.main.gameObject.transform.eulerAngles.ToString ("F5");
 
-		client.Publish("/DanceMorpher/camera/" + myName + "/position", System.Text.Encoding.UTF8.GetBytes(message), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
+			string message = cameraPosition + "/" + cameraEuler + "/" + getTimestamp ();
+
+			client.Publish ("/DanceMorpher/camera/" + myCameraName + "/position", System.Text.Encoding.UTF8.GetBytes (message), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
+		
+		}
 
 		//Debug.Log("sent");
 	
