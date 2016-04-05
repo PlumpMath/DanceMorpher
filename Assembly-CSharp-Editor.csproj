@@ -72,7 +72,6 @@
      <Compile Include="Assets\Editor\ImageEffects\SunShaftsEditor.cs" />
      <Compile Include="Assets\Editor\ImageEffects\TonemappingEditor.cs" />
      <Compile Include="Assets\Editor\ImageEffects\VignetteAndChromaticAberrationEditor.cs" />
-     <Compile Include="Assets\Editor\OSCHelper\OSCHelper.cs" />
      <Compile Include="Assets\Scripts\Editor\DeepCopyGO.cs" />
      <Compile Include="Assets\Scripts\Editor\WizardBakeVertAO.cs" />
      <Compile Include="Assets\Scripts\Editor\WizardClearVertexColors.cs" />

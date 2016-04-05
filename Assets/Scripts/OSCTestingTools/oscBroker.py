@@ -1,5 +1,6 @@
 #!/usr/local/bin/python
 import OSC
+import re
 import time
 import argparse
 
@@ -21,20 +22,33 @@ def quit_callback(path, tags, args, source):
     server.run = False
 
 def camera_position_callback(path, tags, args, source):
-    print "camera positionc allback"
+    global multiclient
+    print "== camera positionc allback"
     print path
     print tags
     print args
     print source
+    print "yooo"
+    print multiclient.getOSCTargets()
 
-def camera_init_callback(path, tags, args, source):
-    global server
+    oscmsg = OSC.OSCMessage('/test/')
+    oscmsg.append("multiclient send")
+    multiclient.send(oscmsg)
 
-    cameraname = args[0]
-    server.addMsgHandler( "/SWG/camera/" + cameraname + "/position", camera_position_callback )
-    
-    print "ADDING " + cameraname + " TO callbacks"
+def reset_handler(path, tags, args, client_address):
+    print "RESET HERE"
 
+def default_handler(path, tags, args, client_address):
+    global server, multiclient
+    match = re.match("/SWG/camera/(\w*)/position", path)
+    if(match):
+        cameraName = match.groups()[0]
+
+        print client_address
+        print "ADDING " + cameraName + " TO callbacks"
+
+        server.addMsgHandler( "/SWG/camera/" + cameraName + "/position", camera_position_callback )
+        multiclient.setOSCTarget((client_address[0], oscPort))
 
 
 ##### RUN SERVER
@@ -46,10 +60,12 @@ server.timeout = 0
 server.run = True
 
 
-server.addMsgHandler( "/SWG/camera/addme", camera_init_callback )
+server.addMsgHandler('default', default_handler)
+server.addMsgHandler('/reset', reset_handler)
 
 while server.run:
     server.handle_request()
 
 server.close()
+
 

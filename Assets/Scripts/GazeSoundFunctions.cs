@@ -37,10 +37,12 @@ public class GazeSoundFunctions{
 
 	public static AudioSource AudioSourcePlayClip (AudioSource asource, AudioClip clip,
 													 bool loop){
-		asource.clip = clip;
-		asource.loop = loop;
-		asource.spatialBlend = 1F; // might not be the place to do this
-		asource.Play();
+		if (!asource.isPlaying) {
+			asource.clip = clip;
+			asource.loop = loop;
+			asource.spatialBlend = 1F; // might not be the place to do this
+				asource.Play ();
+			}
 		return asource;
 	}
 
