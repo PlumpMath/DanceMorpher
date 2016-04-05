@@ -101,11 +101,16 @@ public class HitHandler : MonoBehaviour
 		}
 
 		if (camerasToUpdate.Count > 0) {
-			foreach (string c in camerasToUpdate) {
-				
-				print (c);
-				camerasToUpdate.RemoveAt (0);
+
+			for (int i = camerasToUpdate.Count - 1; i >= 0; i--)
+			{
+				// some code
+				string c = camerasToUpdate[i];
+				camerasToUpdate.RemoveAt(i);
+
+				tryHitForCamera (c, theirStrength, theirRadius, false);
 			}
+
 
 		}
 
@@ -133,8 +138,10 @@ public class HitHandler : MonoBehaviour
 
 
 	void handleGazesHit() {
+		// hit our camera
+		tryHitForCamera(Camera.main.name, myStrength, myRadius, true);
 
-		GameObject candidate = GameObject.Find (candidateName);
+/*		GameObject candidate = GameObject.Find (candidateName);
 
 		//handle our gaze
 		RaycastHit ourRaycastHit = GazeMeshModellerFunctions.GazeUpdate (Camera.main.gameObject, candidate, myStrength, myRadius);
@@ -153,22 +160,31 @@ public class HitHandler : MonoBehaviour
 			} catch {
 			}
 		}
-
-		//handle their gaze
-		if (theirCameraObject) {
-
-			RaycastHit theirRaycastHit = GazeMeshModellerFunctions.GazeUpdate (theirCameraObject, candidate, theirStrength, theirRadius);
-
-			if(theirRaycastHit.collider != null) {
-
-
-				print ("gazehit: THEY hit something!");
-			}
-		} else {
-			print ("theirCameraObject doesn't exist!!!!");
-		}
-
-
+*/
 
 	}
+
+	void tryHitForCamera(string c, float s, float r, bool playsound) {
+		GameObject cameraObject = GameObject.Find (c);
+		GameObject candidate = GameObject.Find (candidateName);
+
+		//handle their gaze
+		if (cameraObject) {
+			RaycastHit rh = GazeMeshModellerFunctions.GazeUpdate (cameraObject, candidate, s, r);
+			if(rh.collider != null) {
+				
+				print ("gazehit: " + c + " hit something!");
+
+				if (playsound) {
+					print ("playing sound");
+					GazeSoundFunctions.PlayRandomHitAtHit (rh);
+				}
+			}
+		} else {
+			print (c + " doesn't exist!!!!");
+		}
+			
+
+	}
+
 }
