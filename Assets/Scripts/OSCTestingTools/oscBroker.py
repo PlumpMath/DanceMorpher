@@ -39,9 +39,12 @@ def camera_init_callback(path, tags, args, source):
 
 ##### RUN SERVER
 
-server = OSC.OSCServer( (oscHost, oscPort) )
+multiclient = OSC.OSCMultiClient()
+
+server = OSC.OSCServer( (oscHost, oscPort), client = multiclient, return_port = oscPort )
 server.timeout = 0
 server.run = True
+
 
 server.addMsgHandler( "/SWG/camera/addme", camera_init_callback )
 
