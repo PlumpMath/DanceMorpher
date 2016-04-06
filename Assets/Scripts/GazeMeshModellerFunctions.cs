@@ -117,16 +117,16 @@ public static class GazeMeshModellerFunctions{
 	// better way of doing this thing is to just return a new RaycastHit no matter what.
 	// It looks like RaycastHit has a null collider field iff it didn't hit anything, so
 	// that stands in nicely for returning false or nil in case of no hit.
-	public static object GazeUpdate(GameObject gazer, GameObject gazeCandidate, 
+	public static RaycastHit GazeUpdate(GameObject gazer, GameObject gazeCandidate, 
 								float strength, float radius){
 		Transform t = gazer.transform;
 		Collider coll = gazeCandidate.GetComponent<Collider>();
 		Ray ray = new Ray(t.position, t.forward);
-		RaycastHit hit;
+		RaycastHit hit = new RaycastHit();
 		if (coll.Raycast(ray, out hit, 1000.0F)){
 			ModelStrike(hit, strength, radius);
 		}
-		return (object) hit;
+		return hit;
 	}
 
 }
