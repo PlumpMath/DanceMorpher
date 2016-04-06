@@ -42,10 +42,7 @@ public class HitHandler : MonoBehaviour
 
 
 	public static GameObject theirCameraObject = null;
-	public static float myStrength = 0.0f; 
-	public static float myRadius = 0.0f;
-	public static float theirStrength = 0.0f; 
-	public static float theirRadius = 0.0f;
+
 	public static string candidateName;
 
 	private static bool resetSceneFlag = false;
@@ -54,6 +51,10 @@ public class HitHandler : MonoBehaviour
 
 	public static List<string> camerasToUpdate;
 
+	public static float growStrength;
+	public static float growRadius;
+	public static float shrinkStrength;
+	public static float shrinkRadius;
 
 	#endregion
 
@@ -64,18 +65,13 @@ public class HitHandler : MonoBehaviour
 		// ALSO we have to set index in InitializeCamera.cs
 
 		//candidateName = "targetCandidate";
-		candidateName = "targetCandidate2";
+		candidateName = "thermoCandidate";
 
+		growStrength = 1.0f;
+		growRadius = 0.02f;
+		shrinkStrength = -1.0f; 
+		shrinkRadius = 0.02f;
 
-		// THE BELOW STUFF JUST MAKES OUR LIVES EASIER. DON'T EDIT.
-		float growStrength = 40.2f; 
-		float growRadius = 10.2f;
-		float shrinkStrength = -7.2f;
-		float shrinkRadius = 10.2f;
-
-
-		myRadius = growRadius;
-		myStrength = growStrength;
 
 		camerasToUpdate = new List<string>();
 
@@ -108,7 +104,7 @@ public class HitHandler : MonoBehaviour
 				string c = camerasToUpdate[i];
 				camerasToUpdate.RemoveAt(i);
 
-				tryHitForCamera (c, theirStrength, theirRadius, false);
+				tryHitForCamera (c, shrinkStrength, shrinkRadius, false);
 			}
 
 
@@ -139,29 +135,8 @@ public class HitHandler : MonoBehaviour
 
 	void handleGazesHit() {
 		// hit our camera
-		tryHitForCamera(Camera.main.name, myStrength, myRadius, true);
-
-/*		GameObject candidate = GameObject.Find (candidateName);
-
-		//handle our gaze
-		RaycastHit ourRaycastHit = GazeMeshModellerFunctions.GazeUpdate (Camera.main.gameObject, candidate, myStrength, myRadius);
-
-		if (ourRaycastHit.collider != null) {
-			try {
-				print ("gazehit: WE hit something!");
-				print (ourRaycastHit.ToString ());
-
-				print ("playing sound");
-				GazeSoundFunctions.PlayRandomHitAtHit(ourRaycastHit);
-
-				print (GazeSoundFunctions.RandomHitClip());
-
-
-			} catch {
-			}
-		}
-*/
-
+		tryHitForCamera(Camera.main.name, growStrength, growRadius, true);
+	
 	}
 
 	void tryHitForCamera(string c, float s, float r, bool playsound) {

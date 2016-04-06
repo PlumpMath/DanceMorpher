@@ -20,7 +20,7 @@ public class InitializeCamera : MonoBehaviour {
 	// PHONE B = 5
 	// PHONE A = 2
 	// COMPUTER = 0
-	public static int index = 0;
+	public static int index = 2;
 
 
 	public GameObject[] thingsToActivate;
