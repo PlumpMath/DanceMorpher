@@ -80,7 +80,7 @@ public class MQTTHandler : MonoBehaviour {
 		
 		// subscribe to the topic "/home/temperature" with QoS 2 
 		client.Subscribe(new string[] { "/DanceMorpher/cameras/positions" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
-		client.Subscribe(new string[] { "/DanceMorpher/resetscene" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
+		client.Subscribe(new string[] { "/DanceMorpher/resetscenedontusethis" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
 		client.Subscribe(new string[] { "/DanceMorpher/reloadmesh" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
 
 	
@@ -198,11 +198,11 @@ public class MQTTHandler : MonoBehaviour {
 
 
 	void setCameraPosition(string cameraName, Vector3 position, Vector3 eulerAngles) {
-		GameObject cameraToSet = GameObject.Find (cameraName);
+		GameObject cameraObjToSet = GameObject.Find (cameraName + "_Model");
 
 
-		cameraToSet.gameObject.transform.position = position;
-		cameraToSet.gameObject.transform.eulerAngles = eulerAngles;
+		cameraObjToSet.gameObject.transform.position = position;
+		cameraObjToSet.gameObject.transform.eulerAngles = eulerAngles;
 
 		// we store the Cameraindex in a static Var so that handleGazesHit() can handle it
 		//print("camera>>>");

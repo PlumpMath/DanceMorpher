@@ -90,7 +90,7 @@ public class HitHandler : MonoBehaviour
 			resetSceneFlag = false;
 			SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex);
 		}
-		if (!playingBackgroundAudio && Camera.main.gameObject != null) {
+		if (playingBackgroundAudio != false && Camera.main != null) {
 			GazeSoundFunctions.PlayBackgroundAtObject (Camera.main.gameObject);
 			print ("playing");
 			playingBackgroundAudio = true;
@@ -128,6 +128,8 @@ public class HitHandler : MonoBehaviour
 
 	public static void lookForHit(string cameraName) {
 		// put this in a queue and look for hit through update()
+
+		print ("lookforhit in " + cameraName);
 
 		camerasToUpdate.Add (cameraName);
 	}
