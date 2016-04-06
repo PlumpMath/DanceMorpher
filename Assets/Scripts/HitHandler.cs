@@ -69,7 +69,7 @@ public class HitHandler : MonoBehaviour
 
 		growStrength = 1.0f;
 		growRadius = 0.02f;
-		shrinkStrength = -1.0f; 
+		shrinkStrength = -10.0f; 
 		shrinkRadius = 0.02f;
 
 
@@ -104,7 +104,7 @@ public class HitHandler : MonoBehaviour
 				string c = camerasToUpdate[i];
 				camerasToUpdate.RemoveAt(i);
 
-				tryHitForCamera (c, shrinkStrength, shrinkRadius, false);
+				tryHitForCamera (c+ "_Model", shrinkStrength, shrinkRadius, false);
 			}
 
 
@@ -142,6 +142,7 @@ public class HitHandler : MonoBehaviour
 	}
 
 	void tryHitForCamera(string c, float s, float r, bool playsound) {
+		
 		GameObject cameraObject = GameObject.Find (c);
 		GameObject candidate = GameObject.Find (candidateName);
 

@@ -50,6 +50,8 @@ public class MQTTHandler : MonoBehaviour {
 
 
 	public static string serverListenHost = "vps.provolot.com";
+	public static string localServerListenHost = "192.168.1.200";
+
 	public static int serverListenPort = 1883;
 
 	public static string myCameraName;
@@ -70,7 +72,8 @@ public class MQTTHandler : MonoBehaviour {
 
 		//Initialize OSC clients (transmitters)
 
-		client = new MqttClient(serverListenHost, serverListenPort , false , null ); 
+		client = new MqttClient(serverListenHost, serverListenPort  , false , null ); 
+
 		
 		// register to message received 
 		client.MqttMsgPublishReceived += client_MqttMsgPublishReceived; 
@@ -84,7 +87,7 @@ public class MQTTHandler : MonoBehaviour {
 		client.Subscribe(new string[] { "/DanceMorpher/reloadmesh" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
 
 	
-		InvokeRepeating("sendCameraMessage", 0, 2F);
+		InvokeRepeating("sendCameraMessage", 0, 0.25F);
 
 
 	}
