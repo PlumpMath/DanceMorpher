@@ -66,11 +66,12 @@ public class HitHandler : MonoBehaviour
 
 		//candidateName = "targetCandidate";
 		candidateName = "thermoCandidate";
+		//candidateName = "SphereLowPoly";
 
-		growStrength = 1.0f;
-		growRadius = 0.02f;
-		shrinkStrength = -10.0f; 
-		shrinkRadius = 0.02f;
+		growStrength = 4.0f;
+		growRadius = 0.05f;
+		shrinkStrength = -4.0f; 
+		shrinkRadius = 0.05f;
 
 
 		camerasToUpdate = new List<string>();
@@ -80,7 +81,7 @@ public class HitHandler : MonoBehaviour
 	void Start() {
 		HitHandler.Instance.Init();
 
-		InvokeRepeating ("handleGazesHit", 1, 0.5F);
+		InvokeRepeating ("handleGazesHit", 1, 1F);
 
 	}
 

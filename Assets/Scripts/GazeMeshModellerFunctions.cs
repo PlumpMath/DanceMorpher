@@ -71,7 +71,9 @@ public static class GazeMeshModellerFunctions{
 		Vector3 hp = targTr.InverseTransformPoint(hit.point);
 		Mesh m = targ.GetComponent<MeshFilter>().mesh;
 		// scale radius, grossly:
-		float radius2 = (targTr.InverseTransformPoint(new Vector3(radius, 0, 0))).magnitude;
+		float radius2 = (targTr.TransformPoint(new Vector3(radius, 0, 0))).magnitude;
+		radius2 = radius;
+
 		Vector3[] vs = m.vertices;
 		// Loop over all vertices, moving towards or away 
 		// from hit point (hp) according to their proximity:
