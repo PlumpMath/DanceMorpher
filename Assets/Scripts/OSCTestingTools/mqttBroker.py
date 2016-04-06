@@ -49,11 +49,11 @@ mqttc.connect(url.hostname, url.port)
 
 # Start subscribe, with QoS level 0
 mqttc.subscribe("/DanceMorpher/camera/Main Camera 0/position", 0)
-mqttc.subscribe("/DanceMorpher/camera/Main Camera 1/position", 0)
-mqttc.subscribe("/DanceMorpher/camera/Main Camera 2/position", 0)
-mqttc.subscribe("/DanceMorpher/camera/Main Camera 3/position", 0)
+#mqttc.subscribe("/DanceMorpher/camera/Main Camera 1/position", 0)
+#mqttc.subscribe("/DanceMorpher/camera/Main Camera 2/position", 0)
+#mqttc.subscribe("/DanceMorpher/camera/Main Camera 3/position", 0)
 mqttc.subscribe("/DanceMorpher/camera/Main Camera 4/position", 0)
-mqttc.subscribe("/DanceMorpher/camera/Main Camera 5/position", 0)
+#mqttc.subscribe("/DanceMorpher/camera/Main Camera 5/position", 0)
 
 # Publish a message
 #mqttc.publish("hello/world", "my message")
