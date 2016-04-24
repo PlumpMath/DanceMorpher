@@ -1,0 +1,18 @@
+## LISTEN
+
+# to listen for all DM messages
+mosquitto_sub -h vps.provolot.com -t "DanceMorpher/#"
+
+# to listen to all cameras
+mosquitto_sub -h vps.provolot.com -t "DanceMorpher/camera/#"
+
+# to listen to 1 camera
+mosquitto_sub -h vps.provolot.com -t "DanceMorpher/camera/1/#"
+
+
+##
+# set remoteServerHost
+mosquitto_pub -h vps.provolot.com -t "/DanceMorpher/setRemoteServerHost" -m "boo.bah.com"
+
+# reset scenes
+mosquitto_pub -h vps.provolot.com -t "/DanceMorpher/resetscenedontusethis" -m "reset"

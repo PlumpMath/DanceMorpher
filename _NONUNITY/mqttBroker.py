@@ -1,5 +1,14 @@
+#!/usr/local/bin/python
+import paho.mqtt.client as mqtt
 import mosquitto, os, urlparse
 import re
+
+"""
+settings = { 'username' : 
+    'password' : 
+mqttc.username_pw_set(url.username, url.password)
+mqttc.connect(url.hostname, url.port)
+"""
 
 cameraPoses = {}
 
@@ -28,7 +37,10 @@ def sendCameraPoses():
     cps = ";".join(cameraPoses.values())
     mqttc.publish("/DanceMorpher/cameras/positions", cps)
 
-mqttc = mosquitto.Mosquitto()
+###################
+
+mqttc = mqtt.Client()
+
 # Assign event callbacks
 mqttc.on_message = on_message
 mqttc.on_connect = on_connect
@@ -41,6 +53,8 @@ mqttc.on_subscribe = on_subscribe
 # Parse CLOUDMQTT_URL (or fallback to localhost)
 url_str = os.environ.get('CLOUDMQTT_URL', 'mqtt://vps.provolot.com:1883')
 url = urlparse.urlparse(url_str)
+
+print url
 
 # Connect
 mqttc.username_pw_set(url.username, url.password)

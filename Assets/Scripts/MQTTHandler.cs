@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Net;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Utility;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
+using System.Text;
 
 using System;
 
@@ -48,9 +50,8 @@ public class MQTTHandler : MonoBehaviour {
 
 	private static string setCamerasString = ""; 
 
-
+	public static string remoteServerListenHost = "vps.provolot.com";
 	public static string serverListenHost = "vps.provolot.com";
-	public static string localServerListenHost = "192.168.1.200";
 
 	public static int serverListenPort = 1883;
 
@@ -64,7 +65,9 @@ public class MQTTHandler : MonoBehaviour {
 	// sends /DanceMorpher/camera/$CAMERANAME/position
 
 
-	private MqttClient client;
+	static MqttClient client;
+	static MqttClient metaClient;
+
 	// Use this for initialization
 	void Start () {
 
@@ -72,25 +75,66 @@ public class MQTTHandler : MonoBehaviour {
 
 		//Initialize OSC clients (transmitters)
 
+		metaClient = new MqttClient(remoteServerListenHost, serverListenPort  , false , null );  // host, port, secure, cert
+
+		// register to message received 
+		metaClient.MqttMsgPublishReceived += metaClient_MqttMsgPublishReceived; 
+
+		string metaClientId = Guid.NewGuid().ToString(); 
+		metaClient.Connect(metaClientId); 
+
+		metaClient.Subscribe(new string[] { "/DanceMorpher/setRemoteServerHost/" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
+
+		Debug.Log ("hey");
+		Debug.Log ("hey");
+
+		Debug.Log (metaClient.IsConnected);
+
+		//initializeMqttClient();
+
+		//InvokeRepeating("sendCameraMessage", 0, 0.25F);
+	}
+
+	void metaClient_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e) 
+	{ 
+		Debug.Log("Received: " + System.Text.Encoding.UTF8.GetString(e.Message) + " From: "+ e.Topic  );
+
+
+		if (e.Topic == "/DanceMorpher/setRemoteServerHost") {
+			Debug.Log ("set Remote Server Info");
+			string msg = System.Text.Encoding.UTF8.GetString(e.Message);
+
+			Text dm = GameObject.Find ("DebugMessage").GetComponent<Text>();
+			dm.text = "setting Remote Server to " + msg;
+
+			serverListenHost = msg;
+			initializeMqttClient ();
+		}
+	} 
+
+
+	void initializeMqttClient() {
+		 
+		if (client != null) {
+			client.Disconnect ();
+		}
+		
 		client = new MqttClient(serverListenHost, serverListenPort  , false , null ); 
 
-		
 		// register to message received 
 		client.MqttMsgPublishReceived += client_MqttMsgPublishReceived; 
-		
+
 		string clientId = Guid.NewGuid().ToString(); 
 		client.Connect(clientId); 
-		
+
 		// subscribe to the topic "/home/temperature" with QoS 2 
 		client.Subscribe(new string[] { "/DanceMorpher/cameras/positions" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
 		client.Subscribe(new string[] { "/DanceMorpher/resetscenedontusethis" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
 		client.Subscribe(new string[] { "/DanceMorpher/reloadmesh" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE }); 
 
-	
-		InvokeRepeating("sendCameraMessage", 0, 0.25F);
-
-
 	}
+
+
 	void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e) 
 	{ 
 
@@ -104,8 +148,6 @@ public class MQTTHandler : MonoBehaviour {
 			setCamerasString = msg;
 			// this stuff will be handled by 'Update()' because Unity wants it so
 		}
-
-
 
 		if (e.Topic == "/DanceMorpher/resetscenedontusethis") {
 			Debug.Log ("Reset Scene!!!");
@@ -175,7 +217,7 @@ public class MQTTHandler : MonoBehaviour {
 
 		//Debug.Log("sending...");
 
-		if (myCameraName != null) {
+		if (client != null && myCameraName != null) {
 
 			string cameraPosition = Camera.main.gameObject.transform.position.ToString ("F5");
 			string cameraEuler = Camera.main.gameObject.transform.eulerAngles.ToString ("F5");

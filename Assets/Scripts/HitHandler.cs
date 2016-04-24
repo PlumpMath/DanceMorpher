@@ -97,6 +97,7 @@ public class HitHandler : MonoBehaviour
 			playingBackgroundAudio = true;
 		}
 
+		/*
 		if (camerasToUpdate.Count > 0) {
 
 			for (int i = camerasToUpdate.Count - 1; i >= 0; i--)
@@ -107,9 +108,8 @@ public class HitHandler : MonoBehaviour
 
 				tryHitForCamera (c+ "_Model", shrinkStrength, shrinkRadius, false);
 			}
-
-
 		}
+		*/
 
 	}
 
